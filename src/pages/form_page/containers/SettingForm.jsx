@@ -23,7 +23,7 @@ import { FormContainer, FormTitle } from "../../../styles/form_page";
 
 export default function SettingForm() {
   const { stateParams, schema, settings, formsValue, values } = useSelector(
-    (state) => state
+    (state) => state,
   );
   const dispatch = useDispatch();
 
@@ -39,10 +39,10 @@ export default function SettingForm() {
             .then((data) =>
               data.map((item) => {
                 return { ...item, title: item.name };
-              })
+              }),
             )
             .then((data) =>
-              dispatch(setValue({ name: "userId", value: data }))
+              dispatch(setValue({ name: "userId", value: data })),
             );
         }
         Promise.all([
@@ -68,8 +68,6 @@ export default function SettingForm() {
     }
   }, [dispatch, stateParams.method, stateParams.entity, stateParams.id]);
 
-  useEffect(() => {}, []);
-
   if (stateParams.isLoadingForm) {
     return <Loading />;
   }
@@ -81,7 +79,7 @@ export default function SettingForm() {
         stateParams.id,
         stateParams.categoryId,
         stateParams.companyID,
-        formsValue
+        formsValue,
       ).then((response) => {
         if (response.status === 422) {
           console.log(response);
@@ -103,7 +101,7 @@ export default function SettingForm() {
           }
         });
       } else {
-        createForm(stateParams.entity, formsValue).then((response) => {
+        createForm(stateParams.entity, {...formsValue, category_id: formsValue?.category_id?.link }).then((response) => {
           if (response.status === 422) {
             dispatch(setErrors(response.data));
           } else {
@@ -131,14 +129,23 @@ export default function SettingForm() {
               />
             </div>
           ) : null}
-          {schema.map(
-            (item, index) =>
-              index !== 0 && (
-                <div key={index}>
-                  <FormTitle key={item.id}>{item.title}</FormTitle>
-                  <InputText key={item.id} readOnly={false} name={item.id} />
-                </div>
-              )
+          {schema.slice(1).map((item, index) =>
+            item.id === "category" ? (
+              <div key={index}>
+                <FormTitle key={item.id}>{item.title}</FormTitle>
+                <DropDown
+                  items={stateParams.tabs.filter(item => !item.settings)}
+                  width="100%"
+                  name="category_id"
+                  newName="category_id"
+                />
+              </div>
+            ) : (
+              <div key={index}>
+                <FormTitle key={item.id}>{item.title}</FormTitle>
+                <InputText key={item.id} readOnly={false} name={item.id} />
+              </div>
+            ),
           )}
           <Button format="submit-form" onClick={submitFormHandle}>
             Сохранить
@@ -174,7 +181,7 @@ export default function SettingForm() {
                 <FormTitle>{item.title}</FormTitle>
                 <InputText readOnly={false} name={item.id} />
               </div>
-            )
+            ),
           )}
           <Button format="submit-form" onClick={submitFormHandle}>
             Сохранить

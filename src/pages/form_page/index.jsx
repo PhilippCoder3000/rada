@@ -15,19 +15,19 @@ export default function FormPage({ format }) {
     default:
       return <Loading />;
   }
-  switch (entity) {
-    case 'report-company':
-    case 'report-user':
-      return <MainForm />;
-    case "admin-create-report":
-    case "admin-create-user":
-    case "admin-create-report":
-      return <SettingForm />;
-    case "company":
-      return <AllReportForm />;
-    case 'report-company-group':
-      return <NewForm/>
-    default:
-      break;
-  }
+  // switch (entity) {
+  //   case 'report-company':
+  //   case 'report-user':
+  //     return <MainForm />;
+  //   case "admin-create-report":
+  //   case "admin-create-user":
+  //   case "admin-create-report":
+  //     return <SettingForm />;
+  //   case "company":
+  //     return <AllReportForm />;
+  //   case 'report-company-group':
+  //     return <NewForm/>
+  //   default:
+  //     break;
+  // }
 }
