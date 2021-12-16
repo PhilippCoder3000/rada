@@ -59,7 +59,11 @@ export default function SettingForm() {
           .then(() => dispatch(setIsLoadingForm(false)));
         break;
       case "update":
-        dispatch(asyncSetSettingsSchema(stateParams.entity))
+        Promise.all([
+          getValidationArray(params.entity),
+          dispatch(asyncSetSettingsSchema(stateParams.entity)),
+        ])
+          .then((array) => dispatch(setValidationArray(array[0])))
           .then(() => dispatch(asyncSetValueForSettingForm(params)))
           .then(() => dispatch(setIsLoadingForm(false)));
         break;
@@ -79,7 +83,7 @@ export default function SettingForm() {
         stateParams.id,
         stateParams.categoryId,
         stateParams.companyID,
-        formsValue,
+        { ...formsValue, category_id: formsValue?.category_id?.link },
       ).then((response) => {
         if (response.status === 422) {
           console.log(response);
@@ -101,7 +105,10 @@ export default function SettingForm() {
           }
         });
       } else {
-        createForm(stateParams.entity, {...formsValue, category_id: formsValue?.category_id?.link }).then((response) => {
+        createForm(stateParams.entity, {
+          ...formsValue,
+          category_id: formsValue?.category_id?.link,
+        }).then((response) => {
           if (response.status === 422) {
             dispatch(setErrors(response.data));
           } else {
@@ -134,7 +141,7 @@ export default function SettingForm() {
               <div key={index}>
                 <FormTitle key={item.id}>{item.title}</FormTitle>
                 <DropDown
-                  items={stateParams.tabs.filter(item => !item.settings)}
+                  items={stateParams.tabs.filter((item) => !item.settings)}
                   width="100%"
                   name="category_id"
                   newName="category_id"
@@ -171,7 +178,17 @@ export default function SettingForm() {
       return (
         <FormContainer>
           {schema.map((item, index) =>
-            index === 0 ? (
+            item.id === "category" ? (
+              <div key={index}>
+                <FormTitle key={item.id}>{item.title}</FormTitle>
+                <DropDown
+                  items={stateParams.tabs.filter((item) => !item.settings)}
+                  width="100%"
+                  name="category_id"
+                  newName="category_id"
+                />
+              </div>
+            ) : index === 0 ? (
               <div key={index}>
                 <FormTitle>{item.title}</FormTitle>
                 <InputText readOnly={true} name={item.id} />
